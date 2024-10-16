@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>롤 내전 팀짜기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #input-area {
+            margin: 20px;
+        }
+        #player-list {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 50px;
+        }
+        .team {
+            display: inline-block;
+            width: 40%;
+            height: 300px;
+            margin: 20px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            vertical-align: top;
+        }
+        .player {
+            padding: 10px;
+            margin: 5px;
+            background-color: #f0f0f0;
+            cursor: grab;
+        }
+    </style>
+</head>
+<body>
+    <h1>롤 내전 팀짜기</h1>
+    <div id="input-area">
+        <input type="text" id="player-name" placeholder="플레이어 이름 입력">
+        <button onclick="addPlayer()">추가</button>
+    </div>
+    <div id="player-list">
+        <!-- 플레이어 블록이 여기에 추가됩니다 -->
+    </div>
+    <div id="teams">
+        <div id="blue-team" class="team" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2>블루 팀</h2>
+        </div>
+        <div id="red-team" class="team" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2>레드 팀</h2>
+        </div>
+    </div>
+
+    <script>
+        function addPlayer() {
+            const playerName = document.getElementById('player-name').value;
+            if (playerName.trim() !== '') {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player';
+                playerDiv.draggable = true;
+                playerDiv.ondragstart = drag;
+                playerDiv.textContent = playerName;
+                document.getElementById('player-list').appendChild(playerDiv);
+                document.getElementById('player-name').value = '';
+            }
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData('text', event.target.id);
+            event.dataTransfer.setData('playerName', event.target.textContent);
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const playerName = event.dataTransfer.getData('playerName');
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'player';
+            playerDiv.draggable = true;
+            playerDiv.ondragstart = drag;
+            playerDiv.textContent = playerName;
+            event.target.appendChild(playerDiv);
+        }
+    </script>
+</body>
+</html>
