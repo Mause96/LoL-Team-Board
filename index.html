@@ -38,7 +38,7 @@
 <body>
     <h1>롤 내전 팀짜기</h1>
     <div id="input-area">
-        <input type="text" id="player-name" placeholder="플레이어 이름 입력">
+        <input type="text" id="player-name" placeholder="플레이어 이름 입력" onkeypress="handleKeyPress(event)">
         <button onclick="addPlayer()">추가</button>
     </div>
     <div id="player-list">
@@ -62,8 +62,19 @@
                 playerDiv.draggable = true;
                 playerDiv.ondragstart = drag;
                 playerDiv.textContent = playerName;
+                playerDiv.oncontextmenu = function(event) {
+                    event.preventDefault();
+                    playerDiv.remove();
+                };
+                playerDiv.id = `player-${Date.now()}`;
                 document.getElementById('player-list').appendChild(playerDiv);
                 document.getElementById('player-name').value = '';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addPlayer();
             }
         }
 
@@ -73,17 +84,12 @@
 
         function drag(event) {
             event.dataTransfer.setData('text', event.target.id);
-            event.dataTransfer.setData('playerName', event.target.textContent);
         }
 
         function drop(event) {
             event.preventDefault();
-            const playerName = event.dataTransfer.getData('playerName');
-            const playerDiv = document.createElement('div');
-            playerDiv.className = 'player';
-            playerDiv.draggable = true;
-            playerDiv.ondragstart = drag;
-            playerDiv.textContent = playerName;
+            const playerId = event.dataTransfer.getData('text');
+            const playerDiv = document.getElementById(playerId);
             event.target.appendChild(playerDiv);
         }
     </script>
