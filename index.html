@@ -32,12 +32,14 @@
             padding: 10px;
             border: 2px solid #ccc;
             vertical-align: top;
+            position: relative;
         }
         .player {
             padding: 10px;
             margin: 5px;
             background-color: #f0f0f0;
             cursor: grab;
+            position: absolute;
         }
     </style>
 </head>
@@ -51,10 +53,10 @@
         <!-- 플레이어 블록이 여기에 추가됩니다 -->
     </div>
     <div id="teams">
-        <div id="blue-team" class="team" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div id="blue-team" class="team">
             <h2>블루 팀</h2>
         </div>
-        <div id="red-team" class="team" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div id="red-team" class="team">
             <h2>레드 팀</h2>
         </div>
     </div>
@@ -65,14 +67,13 @@
             if (playerName.trim() !== '') {
                 const playerDiv = document.createElement('div');
                 playerDiv.className = 'player';
-                playerDiv.draggable = true;
-                playerDiv.ondragstart = drag;
                 playerDiv.textContent = playerName;
                 playerDiv.oncontextmenu = function(event) {
                     event.preventDefault();
                     playerDiv.remove();
                 };
                 playerDiv.id = `player-${Date.now()}`;
+                playerDiv.onmousedown = startDrag;
                 document.getElementById('player-list').appendChild(playerDiv);
                 document.getElementById('player-name').value = '';
             }
@@ -84,19 +85,30 @@
             }
         }
 
-        function allowDrop(event) {
-            event.preventDefault();
-        }
+        function startDrag(event) {
+            const playerDiv = event.target;
+            let shiftX = event.clientX - playerDiv.getBoundingClientRect().left;
+            let shiftY = event.clientY - playerDiv.getBoundingClientRect().top;
 
-        function drag(event) {
-            event.dataTransfer.setData('text', event.target.id);
-        }
+            function moveAt(pageX, pageY) {
+                playerDiv.style.left = pageX - shiftX + 'px';
+                playerDiv.style.top = pageY - shiftY + 'px';
+            }
 
-        function drop(event) {
-            event.preventDefault();
-            const playerId = event.dataTransfer.getData('text');
-            const playerDiv = document.getElementById(playerId);
-            event.target.appendChild(playerDiv);
+            function onMouseMove(event) {
+                moveAt(event.pageX, event.pageY);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            playerDiv.onmouseup = function() {
+                document.removeEventListener('mousemove', onMouseMove);
+                playerDiv.onmouseup = null;
+            };
+
+            playerDiv.ondragstart = function() {
+                return false;
+            };
         }
     </script>
 </body>
